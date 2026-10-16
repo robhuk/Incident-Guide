@@ -1,0 +1,12 @@
+{
+  "name": "HOT / What & Incident Aid Memoire",
+  "short_name": "HOT / What Aid",
+  "description": "Railway HOT / WHAT security assessment and incident aid memoire",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f5f7",
+  "theme_color": "#a50034",
+  "icons": []
+}

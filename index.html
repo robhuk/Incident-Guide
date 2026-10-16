@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#a50034">
+<meta name="description" content="Offline-ready JESIP METHANE and security assessment form">
+<link rel="manifest" href="manifest.json">
+<title>HOT / What &amp; Incident Aid Memoire</title>
+<style>
+:root{--red:#a50034;--red2:#7c0027;--gold:#f2c94c;--ink:#202124;--muted:#62676d;--line:#d9dde2;--bg:#f3f5f7;--card:#fff;--green:#18794e}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:calc(30px + env(safe-area-inset-bottom))}
+header{background:var(--red);color:#fff;padding:calc(16px + env(safe-area-inset-top)) 16px 18px;box-shadow:0 3px 10px #0002}
+.header-inner{max-width:900px;margin:auto}header .eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;opacity:.9;font-weight:700}h1{font-size:1.5rem;line-height:1.15;margin:.3rem 0 .4rem}header p{margin:0;font-size:.9rem;opacity:.94}
+main{max-width:900px;margin:16px auto;padding:0 12px}.toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:14px}
+button,.button{border:0;border-radius:12px;padding:13px 12px;font:700 .95rem system-ui;cursor:pointer;min-height:46px}
+.primary{background:var(--gold);color:#241e08}.dark{background:#272a2e;color:white}.outline{background:#fff;border:1px solid var(--line);color:var(--ink)}.danger{background:#fff0f2;color:#8c002b;border:1px solid #efb8c8}
+.card{background:var(--card);border:1px solid #e3e6e9;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 8px #10182808}
+.card h2{font-size:1.12rem;margin:0 0 4px;color:var(--red)}.intro{color:var(--muted);font-size:.88rem;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{min-width:0}.field.full{grid-column:1/-1}label{display:block;font-size:.88rem;font-weight:750;margin:0 0 5px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);border:1px solid #c9cfd6;border-radius:10px;background:#fff;padding:11px 12px;min-height:45px}
+textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus{outline:3px solid #a5003426;border-color:var(--red)}
+.hint{font-size:.78rem;color:var(--muted);margin-top:4px}.section-tag{display:inline-block;background:#fbe8ee;color:var(--red);font-size:.72rem;font-weight:800;letter-spacing:.06em;padding:4px 8px;border-radius:6px;margin-bottom:8px}
+.choice-row{display:flex;flex-wrap:wrap;gap:8px}.choice{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:.9rem;background:#fff}.choice input{width:18px;height:18px;min-height:auto;margin:0;accent-color:var(--red)}
+.assessment{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}.assessment h3{font-size:1rem;margin:0 0 8px}.preview{white-space:pre-wrap;background:#202124;color:#f5f5f5;border-radius:12px;padding:14px;font: .9rem/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere;min-height:80px}
+.footer-note{font-size:.78rem;color:var(--muted);text-align:center;margin:18px 6px}.status{font-size:.8rem;color:var(--green);font-weight:700}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:14px}h1{font-size:1.35rem}}
+@media print{
+ body{background:#fff;padding:0;font-size:10pt;color:#111}header{background:#fff!important;color:#111!important;box-shadow:none;border-bottom:3px solid #a50034;padding:0 0 10px}
+ main{max-width:none;padding:0;margin:10px 0}.toolbar,.no-print,.footer-note{display:none!important}.card{box-shadow:none;border:1px solid #bbb;border-radius:0;padding:10px;margin:8px 0;break-inside:avoid}
+ .card h2{color:#7c0027}.grid{gap:8px}.preview{background:#fff;color:#111;border:1px solid #999;white-space:pre-wrap}
+ input,select,textarea{border:0;border-bottom:1px solid #aaa;border-radius:0;padding:2px;min-height:0;background:#fff}
+ textarea{min-height:30px}.assessment{break-inside:avoid}a{color:#111;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><div class="eyebrow">Incident reporting • Offline-ready</div><h1>HOT / What &amp; Incident Aid Memoire</h1><p>METHANE report generator · HOT &amp; WHAT security assessment</p></div></header>
+<main>
+<div class="toolbar no-print">
+<button class="primary" id="copyBtn">▣ Copy report</button>
+<button class="dark" id="emailBtn">✉ Email report</button>
+<button class="outline" id="pdfBtn">▤ Save / print PDF</button>
+<button class="outline" id="saveBtn">✓ Save report</button>
+</div>
+<p class="status no-print" id="topSaveStatus" aria-live="polite">Auto-save is on — changes are saved on this device as you type.</p>
+<div class="card">
+<h2>1. Incident details</h2><p class="intro">Record what is known. Use plain English and distinguish confirmed facts from reports or assumptions.</p>
+<div class="grid">
+<div class="field"><label for="dateTime">Date and time reported</label><input id="dateTime" type="datetime-local"></div>
+<div class="field"><label for="incidentStart">Incident start time</label><input id="incidentStart" type="time" aria-describedby="incidentStartHint"><div class="hint" id="incidentStartHint">Defaults to the current time; amend if the incident began earlier.</div></div>
+<div class="field"><label for="incidentEnd">Incident conclusion / stood down time</label><input id="incidentEnd" type="time"></div>
+<div class="field"><label for="reporter">Reporter / call sign / headcode</label><input id="reporter" placeholder="Name, role or call sign"></div>
+<div class="field"><label for="agency">Organisation / agency / operator</label><input id="agency" placeholder="Organisation"></div>
+<div class="field"><label for="contact">Contact / radio channel / phone number</label><input id="contact" placeholder="Contact details or channel"></div>
+<div class="field full"><label for="summary">Initial incident summary</label><textarea id="summary" placeholder="Brief factual overview"></textarea></div>
+</div></div>
+<div class="card">
+<h2>2. M/ETHANE report</h2><p class="intro">Complete the fields available. The report updates automatically. If a major incident has not been declared, consider using ETHANE and review the status as the incident develops.</p>
+<div class="grid">
+<div class="field full"><label> M — Major incident status</label><div class="choice-row">
+<label class="choice"><input type="radio" name="major" value="Declared"> Declared</label><label class="choice"><input type="radio" name="major" value="Standby"> Standby / being considered</label><label class="choice"><input type="radio" name="major" value="Not declared"> Not declared</label><label class="choice"><input type="radio" name="major" value="Unknown" checked> Unknown</label></div></div>
+<div class="field full"><label for="location">E — Exact location</label><textarea id="location" placeholder="Address, landmark, station, road, grid reference / coordinates"></textarea></div>
+<div class="field full"><label for="type">T — Type of incident</label><textarea id="type" placeholder="Nature of incident and what is happening"></textarea></div>
+<div class="field full"><label for="hazards">H — Hazards present or suspected</label><textarea id="hazards" placeholder="Known and potential hazards; state what is confirmed or unconfirmed"></textarea></div>
+<div class="field full"><label for="access">A — Access and egress</label><textarea id="access" placeholder="Safe approach, exit routes, blocked routes, rendezvous point (RVP)"></textarea></div>
+<div class="field"><label for="casualties">N — Number and severity of casualties</label><textarea id="casualties" placeholder="Numbers, types and severity; unknown if not confirmed"></textarea></div>
+<div class="field"><label for="services">E — Emergency services present / required</label><textarea id="services" placeholder="Agency, number of resources, requested support"></textarea></div>
+<div class="field full"><label for="updates">Further information / updates</label><textarea id="updates" placeholder="Time-stamped updates, changes and source of information"></textarea></div>
+</div></div>
+<div class="card">
+<h2>3. JESIP principles &amp; shared understanding</h2><p class="intro">Use these prompts to support joint working. They do not replace local procedures or command decisions.</p>
+<div class="grid">
+<div class="field full"><label for="colocate">Co-locate</label><textarea id="colocate" placeholder="Safe, identifiable location for commanders / liaison"></textarea></div>
+<div class="field full"><label for="communicate">Communicate</label><textarea id="communicate" placeholder="Plain English, communications plan, channel and contact arrangements"></textarea></div>
+<div class="field full"><label for="coordinate">Co-ordinate</label><textarea id="coordinate" placeholder="Lead service, agreed priorities, resources and actions"></textarea></div>
+<div class="field full"><label for="risk">Jointly understand risk</label><textarea id="risk" placeholder="Shared risks, likelihood / impact, control measures and disagreements"></textarea></div>
+<div class="field full"><label for="ssa">Shared situational awareness</label><textarea id="ssa" placeholder="What is known, unknown, changing; next update time"></textarea></div>
+<div class="field full"><label for="decisions">Actions / decisions / owner</label><textarea id="decisions" placeholder="Action — owner — deadline / review time"></textarea></div>
+</div></div>
+<div class="card">
+<h2>4. HOT assessment — suspicious item</h2><p class="intro">Use HOT as a prompt for a suspicious item: Hidden, Obviously suspicious, Typical. Do not touch, move or investigate a suspected item. Follow local security procedures and notify the appropriate control room / police.</p>
+<div class="assessment"><h3>H — Hidden</h3><div class="choice-row"><label class="choice"><input type="radio" name="hotH" value="Yes"> Yes</label><label class="choice"><input type="radio" name="hotH" value="No"> No</label><label class="choice"><input type="radio" name="hotH" value="Unknown" checked> Unknown</label></div><label for="hotHidden" style="margin-top:10px">Observations</label><textarea id="hotHidden" placeholder="Where and how the item was found; do not approach to inspect"></textarea></div>
+<div class="assessment"><h3>O — Obviously suspicious</h3><div class="choice-row"><label class="choice"><input type="radio" name="hotO" value="Yes"> Yes</label><label class="choice"><input type="radio" name="hotO" value="No"> No</label><label class="choice"><input type="radio" name="hotO" value="Unknown" checked> Unknown</label></div><label for="hotObvious" style="margin-top:10px">Observations</label><textarea id="hotObvious" placeholder="Only describe what is already visible from a safe position"></textarea></div>
+<div class="assessment"><h3>T — Typical</h3><div class="choice-row"><label class="choice"><input type="radio" name="hotT" value="Typical"> Typical</label><label class="choice"><input type="radio" name="hotT" value="Unusual"> Unusual</label><label class="choice"><input type="radio" name="hotT" value="Unknown" checked> Unknown</label></div><label for="hotTypical" style="margin-top:10px">Context</label><textarea id="hotTypical" placeholder="Whether the item appears out of place in its surroundings"></textarea></div>
+<div class="grid" style="margin-top:12px"><div class="field"><label for="hotActions">Actions taken</label><textarea id="hotActions" placeholder="Area kept clear, control room informed, etc."></textarea></div><div class="field"><label for="hotNotified">Who was notified / when</label><textarea id="hotNotified" placeholder="Agency, contact, time and reference if known"></textarea></div></div>
+</div>
+<div class="card">
+<h2>5. WHAT security assessment — railway</h2><p class="intro">Use this structured prompt to describe suspicious behaviour in a railway environment. Record observable facts, avoid assumptions, and follow your organisation’s security and escalation procedures.</p>
+<div class="assessment"><h3>W — What are they doing?</h3><label for="whatDoing">Observed actions / behaviour</label><textarea id="whatDoing" placeholder="Describe specific actions, location, duration and any changes in behaviour"></textarea></div>
+<div class="assessment"><h3>H — How are they behaving?</h3><label for="whatBehaviour">Manner of behaviour</label><textarea id="whatBehaviour" placeholder="Describe demeanour and behaviour factually; distinguish direct observation from reports"></textarea></div>
+<div class="assessment"><h3>A — Are they alone or with others?</h3><label for="whatAlone">Associates / group behaviour</label><textarea id="whatAlone" placeholder="Number of people, interactions, coordination, descriptions and direction of travel where safely observed"></textarea></div>
+<div class="assessment"><h3>T — What threat do they pose?</h3><label for="whatThreat">Potential threat and rationale</label><textarea id="whatThreat" placeholder="What risk may exist, who or what could be affected, what is known / unknown and why escalation may be needed"></textarea></div>
+<div class="grid" style="margin-top:12px"><div class="field"><label for="securityRisk">Overall security concern / rationale</label><textarea id="securityRisk" placeholder="Summarise the concern using observable facts and identify information that remains unverified"></textarea></div><div class="field"><label for="securityActions">Immediate actions / escalation</label><textarea id="securityActions" placeholder="Actions taken, control room / British Transport Police notification, time and any reference"></textarea></div></div>
+</div>
+<div class="card">
+<h2>6. Generated report</h2><p class="intro">This preview combines the entered information into a shareable report. Review it for accuracy before sending.</p><div id="preview" class="preview" aria-live="polite"></div>
+<p class="hint no-print">The form saves automatically on this device. Use “Save / print PDF” and choose “Save as PDF” in the print dialogue.</p>
+</div>
+<div class="card no-print"><h2>Device data</h2><p class="intro">Information is stored locally in this browser on this device; it is not sent to a server by this app.</p><div class="toolbar"><button class="outline" id="restoreBtn">Restore saved form</button><button class="danger" id="clearBtn">Clear all fields</button></div><div id="saveStatus" class="status" aria-live="polite">Auto-save enabled</div></div>
+<p class="footer-note">Use alongside current JESIP doctrine, local security policy and control-room instructions. This tool supports information gathering; it does not replace training, command decisions or emergency procedures.</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const ids=['dateTime','incidentStart','incidentEnd','reporter','agency','contact','summary','location','type','hazards','access','casualties','services','updates','colocate','communicate','coordinate','risk','ssa','decisions','hotHidden','hotObvious','hotTypical','hotActions','hotNotified','whatDoing','whatBehaviour','whatAlone','whatThreat','securityRisk','securityActions'];
+const radios=['major','hotH','hotO','hotT','whatW','whatH','whatA','whatT'];
+const storageKey='jesipIncidentAssessment.v2';
+function val(id){return ($(id)?.value||'').trim()}
+function radio(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||'Not recorded'}
+function field(label,id){return `${label}: ${val(id)||'Not recorded'}`}
+function buildReport(){
+ const lines=[
+ 'JESIP INCIDENT ASSESSMENT',
+ `Reported: ${val('dateTime')||'Not recorded'}`,
+ field('Incident start time','incidentStart'),field('Incident conclusion / stood down time','incidentEnd'),
+ field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),
+ '', 'INITIAL INCIDENT SUMMARY',val('summary')||'Not recorded',
+ '', 'M/ETHANE REPORT',
+ `M — Major incident status: ${radio('major')}`,
+ field('E — Exact location','location'),field('T — Type of incident','type'),field('H — Hazards present or suspected','hazards'),field('A — Access and egress','access'),field('N — Number and severity of casualties','casualties'),field('E — Emergency services present / required','services'),field('Further information / updates','updates'),
+ '', 'JESIP PRINCIPLES / SHARED UNDERSTANDING',
+ field('Co-locate','colocate'),field('Communicate','communicate'),field('Co-ordinate','coordinate'),field('Jointly understand risk','risk'),field('Shared situational awareness','ssa'),field('Actions / decisions / owner','decisions'),
+ '', 'HOT ASSESSMENT — SUSPICIOUS ITEM',
+ `H — Hidden: ${radio('hotH')}`,field('Observations','hotHidden'),
+ `O — Obviously suspicious: ${radio('hotO')}`,field('Observations','hotObvious'),
+ `T — Typical: ${radio('hotT')}`,field('Context','hotTypical'),field('Actions taken','hotActions'),field('Who was notified / when','hotNotified'),
+ '', 'WHAT SECURITY ASSESSMENT',
+ field('W — What are they doing?','whatDoing'),
+ field('H — How are they behaving?','whatBehaviour'),
+ field('A — Are they alone or with others?','whatAlone'),
+ field('T — What threat do they pose?','whatThreat'),
+ field('Overall security concern / rationale','securityRisk'),field('Immediate actions / escalation','securityActions'),
+ '', 'END OF REPORT',
+ 'Information should be verified and updated as the incident develops. Follow current local procedures and instructions.'
+ ];
+ return lines.join('\n');
+}
+function state(){const s={};ids.forEach(id=>s[id]=$(id).value);radios.forEach(n=>s['radio:'+n]=radio(n));return s}
+function applyState(s){if(!s)return;ids.forEach(id=>{if(s[id]!==undefined)$(id).value=s[id]});radios.forEach(n=>{const el=[...document.querySelectorAll(`input[name="${n}"]`)].find(x=>x.value===s['radio:'+n]);if(el)el.checked=true});updatePreview()}
+function save(){try{localStorage.setItem(storageKey,JSON.stringify(state()));const stamp='Auto-saved on this device · '+new Date().toLocaleTimeString();$('saveStatus').textContent=stamp;if($('topSaveStatus'))$('topSaveStatus').textContent=stamp;}catch(e){$('saveStatus').textContent='Unable to save in this browser';if($('topSaveStatus'))$('topSaveStatus').textContent='Auto-save unavailable in this browser';}}
+function updatePreview(){$('preview').textContent=buildReport();save()}
+ids.forEach(id=>$(id).addEventListener('input',updatePreview));
+radios.forEach(n=>document.querySelectorAll(`input[name="${n}"]`).forEach(el=>el.addEventListener('change',updatePreview)));
+async function copyReport(){const text=buildReport();try{await navigator.clipboard.writeText(text);alert('Report copied to clipboard.')}catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();alert(ok?'Report copied to clipboard.':'Copy was blocked. Use the report preview to select and copy.');}}
+$('copyBtn').addEventListener('click',copyReport);
+$('emailBtn').addEventListener('click',()=>{const subject=encodeURIComponent('JESIP Incident Assessment — '+(val('location')||'Location not recorded'));const body=encodeURIComponent(buildReport());location.href=`mailto:?subject=${subject}&body=${body}`;});
+$('pdfBtn').addEventListener('click',()=>{updatePreview();window.print()});
+$('saveBtn').addEventListener('click',()=>{save();$('saveStatus').textContent='Saved on this device · '+new Date().toLocaleTimeString();if($('topSaveStatus'))$('topSaveStatus').textContent='Saved on this device · '+new Date().toLocaleTimeString();});
+$('restoreBtn').addEventListener('click',()=>{try{applyState(JSON.parse(localStorage.getItem(storageKey)||'null'));$('saveStatus').textContent='Saved form restored';}catch(e){alert('No saved form was found.')}});
+$('clearBtn').addEventListener('click',()=>{if(!confirm('Clear every field and replace the saved form? This cannot be undone.'))return;ids.forEach(id=>$(id).value='');radios.forEach(n=>{const def=document.querySelector(`input[name="${n}"][value="${n==='major'||n==='hotH'||n==='hotO'||n==='hotT'||n==='whatW'||n==='whatH'||n==='whatA'||n==='whatT'?'Unknown':''}"]`);if(def)def.checked=true});$('dateTime').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);updatePreview();});
+const dt=new Date(Date.now()-new Date().getTimezoneOffset()*60000);$('dateTime').value=dt.toISOString().slice(0,16);$('incidentStart').value=dt.toISOString().slice(11,16);
+try{const saved=JSON.parse(localStorage.getItem(storageKey)||'null');if(saved)applyState(saved);else updatePreview()}catch(e){updatePreview()}
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));
+</script>
+</body></html>
