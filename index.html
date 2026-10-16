@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#a50034">
 <meta name="description" content="Offline-ready JESIP METHANE and security assessment form">
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>HOT / What &amp; Incident Aid Memoire</title>
 <style>
 :root{--red:#a50034;--red2:#7c0027;--gold:#f2c94c;--ink:#202124;--muted:#62676d;--line:#d9dde2;--bg:#f3f5f7;--card:#fff;--green:#18794e}
@@ -27,11 +29,11 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 .modal-backdrop{position:fixed;inset:0;background:#111a;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}.modal-backdrop[hidden]{display:none}.modal-panel{background:#fff;border-radius:16px;padding:18px;width:min(100%,520px);max-height:90dvh;overflow:auto;box-shadow:0 12px 40px #0004}.modal-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.modal-heading h2{margin:0;color:var(--red)}.close-modal{font-size:1.5rem;min-width:44px;padding:4px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.modal-panel textarea{min-height:120px}
 @media(max-width:560px){.grid{grid-template-columns:1fr}.toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:14px}h1{font-size:1.35rem}}
 @media print{
- body{background:#fff;padding:0;font-size:10pt;color:#111}header{background:#fff!important;color:#111!important;box-shadow:none;border-bottom:3px solid #a50034;padding:0 0 10px}
- main{max-width:none;padding:0;margin:10px 0}.toolbar,.no-print,.footer-note{display:none!important}.card{box-shadow:none;border:1px solid #bbb;border-radius:0;padding:10px;margin:8px 0;break-inside:avoid}
- .card h2{color:#7c0027}.grid{gap:8px}.preview{background:#fff;color:#111;border:1px solid #999;white-space:pre-wrap}
- input,select,textarea{border:0;border-bottom:1px solid #aaa;border-radius:0;padding:2px;min-height:0;background:#fff}
- textarea{min-height:30px}.assessment{break-inside:avoid}a{color:#111;text-decoration:none}
+ @page{margin:14mm}
+ html,body{background:#fff!important;margin:0!important;padding:0!important;color:#111!important;font-size:10pt}
+ body *{visibility:hidden!important}
+ #preview{visibility:visible!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#fff!important;color:#111!important;font:10pt/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;white-space:pre-wrap!important;overflow:visible!important;overflow-wrap:anywhere!important}
+ #preview *{visibility:visible!important}
 }
 </style>
 </head>
