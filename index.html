@@ -24,6 +24,7 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 .choice-row{display:flex;flex-wrap:wrap;gap:8px}.choice{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:.9rem;background:#fff}.choice input{width:18px;height:18px;min-height:auto;margin:0;accent-color:var(--red)}
 .assessment{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}.section-collapse>summary{cursor:pointer;list-style:none;font-size:1.12rem;font-weight:800;color:var(--red);display:flex;align-items:center;justify-content:space-between;gap:10px}.section-collapse>summary::-webkit-details-marker{display:none}.section-collapse>summary:after{content:"+";font-size:1.4rem;color:var(--red)}.section-collapse[open]>summary:after{content:"−"}.section-collapse .intro{margin:8px 0 14px}.section-collapse .section-content{margin-top:12px}.assessment h3{font-size:1rem;margin:0 0 8px}.preview{white-space:pre-wrap;background:#202124;color:#f5f5f5;border-radius:12px;padding:14px;font: .9rem/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere;min-height:80px}
 .footer-note{font-size:.78rem;color:var(--muted);text-align:center;margin:18px 6px}.status{font-size:.8rem;color:var(--green);font-weight:700}
+.modal-backdrop{position:fixed;inset:0;background:#111a;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}.modal-backdrop[hidden]{display:none}.modal-panel{background:#fff;border-radius:16px;padding:18px;width:min(100%,520px);max-height:90dvh;overflow:auto;box-shadow:0 12px 40px #0004}.modal-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.modal-heading h2{margin:0;color:var(--red)}.close-modal{font-size:1.5rem;min-width:44px;padding:4px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.modal-panel textarea{min-height:120px}
 @media(max-width:560px){.grid{grid-template-columns:1fr}.toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:14px}h1{font-size:1.35rem}}
 @media print{
  body{background:#fff;padding:0;font-size:10pt;color:#111}header{background:#fff!important;color:#111!important;box-shadow:none;border-bottom:3px solid #a50034;padding:0 0 10px}
@@ -73,7 +74,7 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 <div class="field full"><label for="access">A — Access and egress</label><textarea id="access" placeholder="Safe approach, exit routes, blocked routes, rendezvous point (RVP)"></textarea></div>
 <div class="field"><label for="casualties">N — Number and severity of casualties</label><textarea id="casualties" placeholder="Numbers, types and severity; unknown if not confirmed"></textarea></div>
 <div class="field"><label for="services">E — Emergency services present / required</label><textarea id="services" placeholder="Agency, number of resources, requested support"></textarea></div>
-<div class="field full"><label for="updates">Further information / updates</label><textarea id="updates" placeholder="Time-stamped updates, changes and source of information"></textarea></div>
+<div class="field full"><label for="updates">Further information / updates</label><button type="button" class="outline no-print" id="addUpdateBtn" style="margin:4px 0 8px">＋ Add time-stamped update</button><textarea id="updates" placeholder="Submitted updates appear here"></textarea></div>
 </div></div>
 <div class="card">
 <h2>3. JESIP principles &amp; shared understanding</h2><p class="intro">Use these prompts to support joint working. They do not replace local procedures or command decisions.</p>
@@ -101,6 +102,7 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 <div class="grid" style="margin-top:12px"><div class="field"><label for="securityRisk">Overall security concern / rationale</label><textarea id="securityRisk" placeholder="Summarise the concern using observable facts and identify information that remains unverified"></textarea></div><div class="field"><label for="securityActions">Immediate actions / escalation</label><textarea id="securityActions" placeholder="Actions taken, control room / British Transport Police notification, time and any reference"></textarea></div></div>
 </div>
 <div class="card">
+<div id="updateModal" class="modal-backdrop no-print" hidden><div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="updateModalTitle"><div class="modal-heading"><h2 id="updateModalTitle">Add time-stamped update</h2><button type="button" class="outline close-modal" id="closeUpdateModal" aria-label="Close">×</button></div><label for="updateEntryTime">Time (HH:MM)</label><input id="updateEntryTime" type="time"><label for="updateEntryText" style="margin-top:12px">Update details</label><textarea id="updateEntryText" placeholder="Enter the incident update…" rows="5"></textarea><div class="modal-actions"><button type="button" class="outline" id="cancelUpdate">Cancel</button><button type="button" class="primary" id="submitUpdate">Submit update</button></div></div></div>
 <h2>6. Generated report</h2><p class="intro">This preview combines the entered information into a shareable report. Review it for accuracy before sending.</p><div id="preview" class="preview" aria-live="polite"></div>
 <p class="hint no-print">The form saves automatically on this device. Use “Save / print PDF” and choose “Save as PDF” in the print dialogue.</p>
 </div>
@@ -127,7 +129,7 @@ const $=id=>document.getElementById(id);
 const ids=['dateTime','incidentStart','incidentEnd','reporter','agency','contact','summary','location','type','hazards','access','casualties','services','updates','colocate','communicate','coordinate','risk','ssa','decisions','hotHidden','hotObvious','hotTypical','hotActions','hotNotified','whatDoing','whatBehaviour','whatAlone','whatThreat','securityRisk','securityActions'];
 const radios=['major','hotH','hotO','hotT','whatW','whatH','whatA','whatT'];
 const storageKey='jesipIncidentAssessment.v3';
-function val(id){return ($(id)?.value||'').trim()}
+function val(id){return ($(id)?.value||'').trim()}\nfunction formatDateTime(value){if(!value)return '';const m=value.match(/^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2})/);return m?`${m[3]}/${m[2]}/${m[1].slice(-2)} ${m[4]}:${m[5]}`:value}\nfunction formatTime(value){return value?value.slice(0,5):''}
 function radio(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||'Not recorded'}
 function field(label,id){const v=val(id);return v?`${label}: ${v}`:''}
 function sectionEnabled(name){if(name==='details')return true;return document.querySelector(`.report-section[value="${name}"]`)?.checked!==false}
@@ -135,7 +137,7 @@ function compact(lines){return lines.filter(Boolean)}
 function buildReport(){
  const lines=[];
  if(sectionEnabled('details')){
-  lines.push('','INCIDENT DETAILS',field('Reported', 'dateTime'),field('Incident start time','incidentStart'),(val('incidentEnd')?field('Incident conclusion / stood down time','incidentEnd'):'Incident conclusion / stood down time: ONGOING'),field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),field('Initial incident summary','summary'));
+  lines.push('','INCIDENT DETAILS',(val('dateTime')?`Reported: ${formatDateTime(val('dateTime'))}`:''),(val('incidentStart')?`Incident start time: ${formatTime(val('incidentStart'))}`:''),(val('incidentEnd')?(val('incidentEnd')?`Incident conclusion / stood down time: ${formatTime(val('incidentEnd'))}`:''):'Incident conclusion / stood down time: ONGOING'),field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),field('Initial incident summary','summary'));
  }
  if(sectionEnabled('methane')){
   const methane=compact([field('E — Exact location','location'),field('T — Type of incident','type'),field('H — Hazards present or suspected','hazards'),field('A — Access and egress','access'),field('N — Number and severity of casualties','casualties'),field('E — Emergency services present / required','services'),field('Further information / updates','updates')]);
@@ -173,6 +175,14 @@ $('pdfBtn').addEventListener('click',()=>{updatePreview();window.print()});
 $('saveBtn').addEventListener('click',()=>{save();$('saveStatus').textContent='Saved on this device · '+new Date().toLocaleTimeString();if($('topSaveStatus'))$('topSaveStatus').textContent='Saved on this device · '+new Date().toLocaleTimeString();});
 $('restoreBtn').addEventListener('click',()=>{try{applyState(JSON.parse(localStorage.getItem(storageKey)||'null'));$('saveStatus').textContent='Saved form restored';}catch(e){alert('No saved form was found.')}});
 $('clearBtn').addEventListener('click',()=>{if(!confirm('Clear every field and replace the saved form? This cannot be undone.'))return;ids.forEach(id=>$(id).value='');radios.forEach(n=>{const def=document.querySelector(`input[name="${n}"][value="${n==='major'||n==='hotH'||n==='hotO'||n==='hotT'||n==='whatW'||n==='whatH'||n==='whatA'||n==='whatT'?'Unknown':''}"]`);if(def)def.checked=true});$('dateTime').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);updatePreview();});
+const updateModal=$('updateModal');
+function openUpdateModal(){const now=new Date(Date.now()-new Date().getTimezoneOffset()*60000);$('updateEntryTime').value=now.toISOString().slice(11,16);$('updateEntryText').value='';updateModal.hidden=false;$('updateEntryText').focus()}
+function closeUpdateModal(){updateModal.hidden=true}
+$('addUpdateBtn').addEventListener('click',openUpdateModal);
+$('closeUpdateModal').addEventListener('click',closeUpdateModal);
+$('cancelUpdate').addEventListener('click',closeUpdateModal);
+updateModal.addEventListener('click',e=>{if(e.target===updateModal)closeUpdateModal()});
+$('submitUpdate').addEventListener('click',()=>{const detail=$('updateEntryText').value.trim();if(!detail){alert('Enter update details before submitting.');$('updateEntryText').focus();return}const time=$('updateEntryTime').value||'Time not recorded';const existing=$('updates').value.trim();$('updates').value=existing?existing+'\\n'+time+' — '+detail:time+' — '+detail;closeUpdateModal();updatePreview()});
 const dt=new Date(Date.now()-new Date().getTimezoneOffset()*60000);$('dateTime').value=dt.toISOString().slice(0,16);$('incidentStart').value=dt.toISOString().slice(11,16);
 try{const saved=JSON.parse(localStorage.getItem(storageKey)||'null');if(saved)applyState(saved);else updatePreview()}catch(e){updatePreview()}
 if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));
