@@ -54,7 +54,7 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 <label class="choice"><input type="checkbox" class="report-section" value="what" checked> WHAT assessment</label>
 </div></div>
 <p class="status no-print" id="topSaveStatus" aria-live="polite">Auto-save is on — changes are saved on this device as you type.</p>
-<div class="card">
+<div class="card" id="incidentDetails">
 <h2>1. Incident details</h2><p class="intro">Record what is known. Use plain English and distinguish confirmed facts from reports or assumptions.</p>
 <div class="grid">
 <div class="field"><label for="dateTime">Date and time reported</label><input id="dateTime" type="datetime-local"></div>
@@ -65,13 +65,18 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 <div class="field"><label for="contact">Contact / radio channel / phone number</label><input id="contact" placeholder="Contact details or channel"></div>
 <div class="field full"><label for="summary">Initial incident summary</label><textarea id="summary" placeholder="Brief factual overview"></textarea></div>
 </div></div>
+<div class="card" id="incidentLogCard">
+<h2>2. Incident log</h2><p class="intro">Add a time-stamped entry whenever new information, actions or decisions are recorded.</p>
+<div class="field full"><button type="button" class="primary no-print" id="addLogEntryBtn" aria-label="Add time-stamped incident log entry">＋ Add log entry</button><textarea id="incidentLog" placeholder="Time-stamped incident log entries will appear here" rows="6"></textarea></div>
+<div id="logModal" class="modal-backdrop no-print" hidden><div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="logModalTitle"><div class="modal-heading"><h2 id="logModalTitle">Add incident log entry</h2><button type="button" class="outline close-modal" id="closeLogModal" aria-label="Close">×</button></div><label for="logEntryTime">Time (HH:MM)</label><input id="logEntryTime" type="time"><label for="logEntryText" style="margin-top:12px">Log entry</label><textarea id="logEntryText" placeholder="Record information, action or decision…" rows="5"></textarea><div class="modal-actions"><button type="button" class="outline" id="cancelLogEntry">Cancel</button><button type="button" class="primary" id="submitLogEntry">＋ Add entry</button></div></div></div>
+</div>
 <div class="card">
-<h2>2. M/ETHANE report</h2><p class="intro">Complete the fields available. The report updates automatically. If a major incident has not been declared, consider using ETHANE and review the status as the incident develops.</p>
+<h2>3. M/ETHANE report</h2><p class="intro">Complete the fields available. The report updates automatically. If a major incident has not been declared, consider using ETHANE and review the status as the incident develops.</p>
 <div class="grid">
 <div class="field full"><label> M — Major incident status</label><div class="choice-row">
 <label class="choice"><input type="radio" name="major" value="Declared"> Declared</label><label class="choice"><input type="radio" name="major" value="Standby"> Standby / being considered</label><label class="choice"><input type="radio" name="major" value="Not declared"> Not declared</label><label class="choice"><input type="radio" name="major" value="Unknown" checked> Unknown</label></div></div>
 <div class="field full"><label for="location">E — Exact location</label><textarea id="location" placeholder="Address, landmark, station, road, grid reference / coordinates"></textarea></div>
-<div class="field full"><label for="type">T — Type of incident</label><textarea id="type" placeholder="Nature of incident and what is happening"></textarea></div>
+<div class="field full"><label for="type">T — Type of incident</label><select id="type" required><option value="">Select incident type…</option><optgroup label="JESIP / emergency incident types"><option>Fire or smoke</option><option>Aircraft crash</option><option>Road traffic collision</option><option>Hazardous materials / chemical incident</option><option>Explosion or suspected explosive device</option><option>CBRN incident</option><option>Structural collapse</option><option>Flooding / severe weather</option><option>Public disorder</option><option>Suspected terrorism</option><option>Industrial accident</option><option>Major incident — other emergency</option><option>Medical emergency / multiple casualties</option></optgroup><optgroup label="Railway incidents"><option>Person struck by train</option><option>Person on or near the line</option><option>Trespass / track access</option><option>Train derailment</option><option>Train collision</option><option>Train fire / smoke onboard</option><option>Train failure / stranded train</option><option>Obstruction on the railway</option><option>Level crossing incident</option><option>Station incident</option><option>Overcrowding / crowd safety</option><option>Violence / assault</option><option>Suspicious item / security concern</option><option>Railway infrastructure / signalling failure</option><option>Power supply / overhead line incident</option><option>Evacuation</option></optgroup><option value="Other">Other — specify nature</option></select><div class="field full" id="incidentNatureWrap" hidden><label for="incidentNature">Nature of incident</label><input id="incidentNature" placeholder="Describe the incident type"></div></div>
 <div class="field full"><label for="hazards">H — Hazards present or suspected</label><textarea id="hazards" placeholder="Known and potential hazards; state what is confirmed or unconfirmed"></textarea></div>
 <div class="field full"><label for="access">A — Access and egress</label><textarea id="access" placeholder="Safe approach, exit routes, blocked routes, rendezvous point (RVP)"></textarea></div>
 <div class="field"><label for="casualties">N — Number and severity of casualties</label><textarea id="casualties" placeholder="Numbers, types and severity; unknown if not confirmed"></textarea></div>
@@ -79,7 +84,7 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 <div class="field full"><label for="updates">Further information / updates</label><button type="button" class="outline no-print" id="addUpdateBtn" style="margin:4px 0 8px">＋ Add time-stamped update</button><textarea id="updates" placeholder="Submitted updates appear here"></textarea></div>
 </div></div>
 <div class="card">
-<h2>3. JESIP principles &amp; shared understanding</h2><p class="intro">Use these prompts to support joint working. They do not replace local procedures or command decisions.</p>
+<h2>4. JESIP principles &amp; shared understanding</h2><p class="intro">Use these prompts to support joint working. They do not replace local procedures or command decisions.</p>
 <div class="grid">
 <div class="field full"><label for="colocate">Co-locate</label><textarea id="colocate" placeholder="Safe, identifiable location for commanders / liaison"></textarea></div>
 <div class="field full"><label for="communicate">Communicate</label><textarea id="communicate" placeholder="Plain English, communications plan, channel and contact arrangements"></textarea></div>
@@ -89,14 +94,14 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 <div class="field full"><label for="decisions">Actions / decisions / owner</label><textarea id="decisions" placeholder="Action — owner — deadline / review time"></textarea></div>
 </div></div>
 <div class="card">
-<h2>4. HOT assessment — suspicious item</h2><p class="intro">Use HOT as a prompt for a suspicious item: Hidden, Obviously suspicious, Typical. Do not touch, move or investigate a suspected item. Follow local security procedures and notify the appropriate control room / police.</p>
+<h2>5. HOT assessment — suspicious item</h2><p class="intro">Use HOT as a prompt for a suspicious item: Hidden, Obviously suspicious, Typical. Do not touch, move or investigate a suspected item. Follow local security procedures and notify the appropriate control room / police.</p>
 <div class="assessment"><h3>H — Hidden</h3><div class="choice-row"><label class="choice"><input type="radio" name="hotH" value="Yes"> Yes</label><label class="choice"><input type="radio" name="hotH" value="No"> No</label><label class="choice"><input type="radio" name="hotH" value="Unknown" checked> Unknown</label></div><label for="hotHidden" style="margin-top:10px">Observations</label><textarea id="hotHidden" placeholder="Where and how the item was found; do not approach to inspect"></textarea></div>
 <div class="assessment"><h3>O — Obviously suspicious</h3><div class="choice-row"><label class="choice"><input type="radio" name="hotO" value="Yes"> Yes</label><label class="choice"><input type="radio" name="hotO" value="No"> No</label><label class="choice"><input type="radio" name="hotO" value="Unknown" checked> Unknown</label></div><label for="hotObvious" style="margin-top:10px">Observations</label><textarea id="hotObvious" placeholder="Only describe what is already visible from a safe position"></textarea></div>
 <div class="assessment"><h3>T — Typical</h3><div class="choice-row"><label class="choice"><input type="radio" name="hotT" value="Typical"> Typical</label><label class="choice"><input type="radio" name="hotT" value="Unusual"> Unusual</label><label class="choice"><input type="radio" name="hotT" value="Unknown" checked> Unknown</label></div><label for="hotTypical" style="margin-top:10px">Context</label><textarea id="hotTypical" placeholder="Whether the item appears out of place in its surroundings"></textarea></div>
 <div class="grid" style="margin-top:12px"><div class="field"><label for="hotActions">Actions taken</label><textarea id="hotActions" placeholder="Area kept clear, control room informed, etc."></textarea></div><div class="field"><label for="hotNotified">Who was notified / when</label><textarea id="hotNotified" placeholder="Agency, contact, time and reference if known"></textarea></div></div>
 </div>
 <div class="card">
-<h2>5. WHAT security assessment — railway</h2><p class="intro">Use this structured prompt to describe suspicious behaviour in a railway environment. Record observable facts, avoid assumptions, and follow your organisation’s security and escalation procedures.</p>
+<h2>6. WHAT security assessment — railway</h2><p class="intro">Use this structured prompt to describe suspicious behaviour in a railway environment. Record observable facts, avoid assumptions, and follow your organisation’s security and escalation procedures.</p>
 <div class="assessment"><h3>W — What are they doing?</h3><label for="whatDoing">Observed actions / behaviour</label><textarea id="whatDoing" placeholder="Describe specific actions, location, duration and any changes in behaviour"></textarea></div>
 <div class="assessment"><h3>H — How are they behaving?</h3><label for="whatBehaviour">Manner of behaviour</label><textarea id="whatBehaviour" placeholder="Describe demeanour and behaviour factually; distinguish direct observation from reports"></textarea></div>
 <div class="assessment"><h3>A — Are they alone or with others?</h3><label for="whatAlone">Associates / group behaviour</label><textarea id="whatAlone" placeholder="Number of people, interactions, coordination, descriptions and direction of travel where safely observed"></textarea></div>
@@ -105,7 +110,7 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 </div>
 <div class="card">
 <div id="updateModal" class="modal-backdrop no-print" hidden><div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="updateModalTitle"><div class="modal-heading"><h2 id="updateModalTitle">Add time-stamped update</h2><button type="button" class="outline close-modal" id="closeUpdateModal" aria-label="Close">×</button></div><label for="updateEntryTime">Time (HH:MM)</label><input id="updateEntryTime" type="time"><label for="updateEntryText" style="margin-top:12px">Update details</label><textarea id="updateEntryText" placeholder="Enter the incident update…" rows="5"></textarea><div class="modal-actions"><button type="button" class="outline" id="cancelUpdate">Cancel</button><button type="button" class="primary" id="submitUpdate">Submit update</button></div></div></div>
-<h2>6. Generated report</h2><p class="intro">This preview combines the entered information into a shareable report. Review it for accuracy before sending.</p><div id="preview" class="preview" aria-live="polite"></div>
+<h2>7. Generated report</h2><p class="intro">This preview combines the entered information into a shareable report. Review it for accuracy before sending.</p><div id="preview" class="preview" aria-live="polite"></div>
 <p class="hint no-print">The form saves automatically on this device. Use “Save / print PDF” and choose “Save as PDF” in the print dialogue.</p>
 </div>
 <div class="card no-print"><h2>Device data</h2><p class="intro">Information is stored locally in this browser on this device; it is not sent to a server by this app.</p><div class="toolbar"><button class="outline" id="restoreBtn">Restore saved form</button><button class="danger" id="clearBtn">Clear all fields</button></div><div id="saveStatus" class="status" aria-live="polite">Auto-save enabled</div></div>
@@ -114,7 +119,7 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 <script>
 // Make content sections collapsible and collapsed by default.
 document.querySelectorAll('main > .card').forEach(card=>{
- if(card.id==='reportOptions')return;
+ if(card.id==='reportOptions'||card.id==='incidentDetails')return;
  const heading=card.querySelector(':scope > h2');
  if(!heading)return;
  const intro=card.querySelector(':scope > p.intro');
@@ -128,7 +133,7 @@ document.querySelectorAll('main > .card').forEach(card=>{
  card.replaceChildren(details);
 });
 const $=id=>document.getElementById(id);
-const ids=['dateTime','incidentStart','incidentEnd','reporter','agency','contact','summary','location','type','hazards','access','casualties','services','updates','colocate','communicate','coordinate','risk','ssa','decisions','hotHidden','hotObvious','hotTypical','hotActions','hotNotified','whatDoing','whatBehaviour','whatAlone','whatThreat','securityRisk','securityActions'];
+const ids=['dateTime','incidentStart','incidentEnd','reporter','agency','contact','summary','location','type','incidentNature','incidentLog','hazards','access','casualties','services','updates','colocate','communicate','coordinate','risk','ssa','decisions','hotHidden','hotObvious','hotTypical','hotActions','hotNotified','whatDoing','whatBehaviour','whatAlone','whatThreat','securityRisk','securityActions'];
 const radios=['major','hotH','hotO','hotT','whatW','whatH','whatA','whatT'];
 const storageKey='jesipIncidentAssessment.v3';
 function val(id){return ($(id)?.value||'').trim()}
@@ -141,10 +146,11 @@ function compact(lines){return lines.filter(Boolean)}
 function buildReport(){
  const lines=[];
  if(sectionEnabled('details')){
-  lines.push('','INCIDENT DETAILS',(val('dateTime')?`Reported: ${formatDateTime(val('dateTime'))}`:''),(val('incidentStart')?`Incident start time: ${formatTime(val('incidentStart'))}`:''),(val('incidentEnd')?`Incident conclusion / stood down time: ${formatTime(val('incidentEnd'))}`:'Incident conclusion / stood down time: ONGOING'),field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),field('Initial incident summary','summary'));
+  lines.push('','INCIDENT DETAILS',(val('dateTime')?`Reported: ${formatDateTime(val('dateTime'))}`:''),(val('incidentStart')?`Incident start time: ${formatTime(val('incidentStart'))}`:''),(val('incidentEnd')?`Incident conclusion / stood down time: ${formatTime(val('incidentEnd'))}`:'Incident conclusion / stood down time: ONGOING'),field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),field('Initial incident summary','summary'),(val('type')?`Incident type: ${val('type')==='Other'?(val('incidentNature')||'Other (nature not specified)'):val('type')}`:''));
  }
+ const logText=val('incidentLog');if(logText)lines.push('','INCIDENT LOG',logText);
  if(sectionEnabled('methane')){
-  const methane=compact([field('E — Exact location','location'),field('T — Type of incident','type'),field('H — Hazards present or suspected','hazards'),field('A — Access and egress','access'),field('N — Number and severity of casualties','casualties'),field('E — Emergency services present / required','services'),field('Further information / updates','updates')]);
+  const methane=compact([field('E — Exact location','location'),(val('type')?`T — Type of incident: ${val('type')==='Other'?(val('incidentNature')||'Other (nature not specified)'):val('type')}`:''),field('H — Hazards present or suspected','hazards'),field('A — Access and egress','access'),field('N — Number and severity of casualties','casualties'),field('E — Emergency services present / required','services'),field('Further information / updates','updates')]);
   const major=document.querySelector('input[name="major"]:checked')?.value;
   if(major && major!=='Unknown') methane.unshift(`M — Major incident status: ${major}`);
   if(methane.length)lines.push('','M/ETHANE REPORT',...methane);
@@ -166,10 +172,13 @@ function buildReport(){
  return lines.length>1?lines.join('\n'):'No completed information in the selected report sections.';
 }
 function state(){const s={};ids.forEach(id=>s[id]=$(id).value);radios.forEach(n=>s['radio:'+n]=radio(n));return s}
-function applyState(s){if(!s)return;ids.forEach(id=>{if(s[id]!==undefined)$(id).value=s[id]});radios.forEach(n=>{const el=[...document.querySelectorAll(`input[name="${n}"]`)].find(x=>x.value===s['radio:'+n]);if(el)el.checked=true});updatePreview()}
+function applyState(s){if(!s)return;ids.forEach(id=>{if(s[id]!==undefined)$(id).value=s[id]});radios.forEach(n=>{const el=[...document.querySelectorAll(`input[name="${n}"]`)].find(x=>x.value===s['radio:'+n]);if(el)el.checked=true});updateIncidentNature();updatePreview()}
 function save(){try{localStorage.setItem(storageKey,JSON.stringify(state()));const stamp='Auto-saved on this device · '+new Date().toLocaleTimeString();$('saveStatus').textContent=stamp;if($('topSaveStatus'))$('topSaveStatus').textContent=stamp;}catch(e){$('saveStatus').textContent='Unable to save in this browser';if($('topSaveStatus'))$('topSaveStatus').textContent='Auto-save unavailable in this browser';}}
 function updatePreview(){$('preview').textContent=buildReport();save()}
+function updateIncidentNature(){const other=val('type')==='Other';$('incidentNatureWrap').hidden=!other;$('incidentNature').required=other;if(!other)$('incidentNature').value='';}
+$('type').addEventListener('change',()=>{updateIncidentNature();updatePreview()});
 ids.forEach(id=>$(id).addEventListener('input',updatePreview));
+updateIncidentNature();
 radios.forEach(n=>document.querySelectorAll(`input[name="${n}"]`).forEach(el=>el.addEventListener('change',updatePreview)));
 document.querySelectorAll('.report-section').forEach(el=>el.addEventListener('change',updatePreview));
 async function copyReport(){const text=buildReport();try{await navigator.clipboard.writeText(text);alert('Report copied to clipboard.')}catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();alert(ok?'Report copied to clipboard.':'Copy was blocked. Use the report preview to select and copy.');}}
@@ -179,6 +188,11 @@ $('pdfBtn').addEventListener('click',()=>{updatePreview();window.print()});
 $('saveBtn').addEventListener('click',()=>{save();$('saveStatus').textContent='Saved on this device · '+new Date().toLocaleTimeString();if($('topSaveStatus'))$('topSaveStatus').textContent='Saved on this device · '+new Date().toLocaleTimeString();});
 $('restoreBtn').addEventListener('click',()=>{try{applyState(JSON.parse(localStorage.getItem(storageKey)||'null'));$('saveStatus').textContent='Saved form restored';}catch(e){alert('No saved form was found.')}});
 $('clearBtn').addEventListener('click',()=>{if(!confirm('Clear every field and replace the saved form? This cannot be undone.'))return;ids.forEach(id=>$(id).value='');radios.forEach(n=>{const def=document.querySelector(`input[name="${n}"][value="${n==='major'||n==='hotH'||n==='hotO'||n==='hotT'||n==='whatW'||n==='whatH'||n==='whatA'||n==='whatT'?'Unknown':''}"]`);if(def)def.checked=true});$('dateTime').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);updatePreview();});
+const logModal=$('logModal');
+function openLogModal(){const now=new Date(Date.now()-new Date().getTimezoneOffset()*60000);$('logEntryTime').value=now.toISOString().slice(11,16);$('logEntryText').value='';logModal.hidden=false;$('logEntryText').focus()}
+function closeLogModal(){logModal.hidden=true}
+$('addLogEntryBtn').addEventListener('click',openLogModal);$('closeLogModal').addEventListener('click',closeLogModal);$('cancelLogEntry').addEventListener('click',closeLogModal);logModal.addEventListener('click',e=>{if(e.target===logModal)closeLogModal()});
+$('submitLogEntry').addEventListener('click',()=>{const detail=$('logEntryText').value.trim();if(!detail){alert('Enter details for the log entry.');$('logEntryText').focus();return}const time=$('logEntryTime').value||'Time not recorded';const existing=$('incidentLog').value.trim();$('incidentLog').value=existing?existing+'\n'+time+' — '+detail:time+' — '+detail;closeLogModal();updatePreview()});
 const updateModal=$('updateModal');
 function openUpdateModal(){const now=new Date(Date.now()-new Date().getTimezoneOffset()*60000);$('updateEntryTime').value=now.toISOString().slice(11,16);$('updateEntryText').value='';updateModal.hidden=false;$('updateEntryText').focus()}
 function closeUpdateModal(){updateModal.hidden=true}
