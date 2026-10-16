@@ -129,7 +129,9 @@ const $=id=>document.getElementById(id);
 const ids=['dateTime','incidentStart','incidentEnd','reporter','agency','contact','summary','location','type','hazards','access','casualties','services','updates','colocate','communicate','coordinate','risk','ssa','decisions','hotHidden','hotObvious','hotTypical','hotActions','hotNotified','whatDoing','whatBehaviour','whatAlone','whatThreat','securityRisk','securityActions'];
 const radios=['major','hotH','hotO','hotT','whatW','whatH','whatA','whatT'];
 const storageKey='jesipIncidentAssessment.v3';
-function val(id){return ($(id)?.value||'').trim()}\nfunction formatDateTime(value){if(!value)return '';const m=value.match(/^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2})/);return m?`${m[3]}/${m[2]}/${m[1].slice(-2)} ${m[4]}:${m[5]}`:value}\nfunction formatTime(value){return value?value.slice(0,5):''}
+function val(id){return ($(id)?.value||'').trim()}
+function formatDateTime(value){if(!value)return '';const m=value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);return m?`${m[3]}/${m[2]}/${m[1].slice(-2)} ${m[4]}:${m[5]}`:value}
+function formatTime(value){return value?value.slice(0,5):''}
 function radio(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||'Not recorded'}
 function field(label,id){const v=val(id);return v?`${label}: ${v}`:''}
 function sectionEnabled(name){if(name==='details')return true;return document.querySelector(`.report-section[value="${name}"]`)?.checked!==false}
@@ -137,7 +139,7 @@ function compact(lines){return lines.filter(Boolean)}
 function buildReport(){
  const lines=[];
  if(sectionEnabled('details')){
-  lines.push('','INCIDENT DETAILS',(val('dateTime')?`Reported: ${formatDateTime(val('dateTime'))}`:''),(val('incidentStart')?`Incident start time: ${formatTime(val('incidentStart'))}`:''),(val('incidentEnd')?(val('incidentEnd')?`Incident conclusion / stood down time: ${formatTime(val('incidentEnd'))}`:''):'Incident conclusion / stood down time: ONGOING'),field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),field('Initial incident summary','summary'));
+  lines.push('','INCIDENT DETAILS',(val('dateTime')?`Reported: ${formatDateTime(val('dateTime'))}`:''),(val('incidentStart')?`Incident start time: ${formatTime(val('incidentStart'))}`:''),(val('incidentEnd')?`Incident conclusion / stood down time: ${formatTime(val('incidentEnd'))}`:'Incident conclusion / stood down time: ONGOING'),field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),field('Initial incident summary','summary'));
  }
  if(sectionEnabled('methane')){
   const methane=compact([field('E — Exact location','location'),field('T — Type of incident','type'),field('H — Hazards present or suspected','hazards'),field('A — Access and egress','access'),field('N — Number and severity of casualties','casualties'),field('E — Emergency services present / required','services'),field('Further information / updates','updates')]);
@@ -170,7 +172,7 @@ radios.forEach(n=>document.querySelectorAll(`input[name="${n}"]`).forEach(el=>el
 document.querySelectorAll('.report-section').forEach(el=>el.addEventListener('change',updatePreview));
 async function copyReport(){const text=buildReport();try{await navigator.clipboard.writeText(text);alert('Report copied to clipboard.')}catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();alert(ok?'Report copied to clipboard.':'Copy was blocked. Use the report preview to select and copy.');}}
 $('copyBtn').addEventListener('click',copyReport);
-$('emailBtn').addEventListener('click',()=>{const subject=encodeURIComponent('JESIP Incident Assessment — '+(val('location')||'Location not recorded'));const body=encodeURIComponent(buildReport());location.href=`mailto:?subject=${subject}&body=${body}`;});
+$('emailBtn').addEventListener('click',()=>{const subject=encodeURIComponent('HOT / What Incident Aid Memoire — '+(val('location')||'Location not recorded'));const body=encodeURIComponent(buildReport());location.href=`mailto:?subject=${subject}&body=${body}`;});
 $('pdfBtn').addEventListener('click',()=>{updatePreview();window.print()});
 $('saveBtn').addEventListener('click',()=>{save();$('saveStatus').textContent='Saved on this device · '+new Date().toLocaleTimeString();if($('topSaveStatus'))$('topSaveStatus').textContent='Saved on this device · '+new Date().toLocaleTimeString();});
 $('restoreBtn').addEventListener('click',()=>{try{applyState(JSON.parse(localStorage.getItem(storageKey)||'null'));$('saveStatus').textContent='Saved form restored';}catch(e){alert('No saved form was found.')}});
@@ -182,7 +184,7 @@ $('addUpdateBtn').addEventListener('click',openUpdateModal);
 $('closeUpdateModal').addEventListener('click',closeUpdateModal);
 $('cancelUpdate').addEventListener('click',closeUpdateModal);
 updateModal.addEventListener('click',e=>{if(e.target===updateModal)closeUpdateModal()});
-$('submitUpdate').addEventListener('click',()=>{const detail=$('updateEntryText').value.trim();if(!detail){alert('Enter update details before submitting.');$('updateEntryText').focus();return}const time=$('updateEntryTime').value||'Time not recorded';const existing=$('updates').value.trim();$('updates').value=existing?existing+'\\n'+time+' — '+detail:time+' — '+detail;closeUpdateModal();updatePreview()});
+$('submitUpdate').addEventListener('click',()=>{const detail=$('updateEntryText').value.trim();if(!detail){alert('Enter update details before submitting.');$('updateEntryText').focus();return}const time=$('updateEntryTime').value||'Time not recorded';const existing=$('updates').value.trim();$('updates').value=existing?existing+'\n'+time+' — '+detail:time+' — '+detail;closeUpdateModal();updatePreview()});
 const dt=new Date(Date.now()-new Date().getTimezoneOffset()*60000);$('dateTime').value=dt.toISOString().slice(0,16);$('incidentStart').value=dt.toISOString().slice(11,16);
 try{const saved=JSON.parse(localStorage.getItem(storageKey)||'null');if(saved)applyState(saved);else updatePreview()}catch(e){updatePreview()}
 if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));
