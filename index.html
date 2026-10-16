@@ -22,7 +22,7 @@ input,select,textarea{width:100%;font:inherit;color:var(--ink);border:1px solid 
 textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus{outline:3px solid #a5003426;border-color:var(--red)}
 .hint{font-size:.78rem;color:var(--muted);margin-top:4px}.section-tag{display:inline-block;background:#fbe8ee;color:var(--red);font-size:.72rem;font-weight:800;letter-spacing:.06em;padding:4px 8px;border-radius:6px;margin-bottom:8px}
 .choice-row{display:flex;flex-wrap:wrap;gap:8px}.choice{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:.9rem;background:#fff}.choice input{width:18px;height:18px;min-height:auto;margin:0;accent-color:var(--red)}
-.assessment{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}.assessment h3{font-size:1rem;margin:0 0 8px}.preview{white-space:pre-wrap;background:#202124;color:#f5f5f5;border-radius:12px;padding:14px;font: .9rem/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere;min-height:80px}
+.assessment{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}.section-collapse>summary{cursor:pointer;list-style:none;font-size:1.12rem;font-weight:800;color:var(--red);display:flex;align-items:center;justify-content:space-between;gap:10px}.section-collapse>summary::-webkit-details-marker{display:none}.section-collapse>summary:after{content:"+";font-size:1.4rem;color:var(--red)}.section-collapse[open]>summary:after{content:"−"}.section-collapse .intro{margin:8px 0 14px}.section-collapse .section-content{margin-top:12px}.assessment h3{font-size:1rem;margin:0 0 8px}.preview{white-space:pre-wrap;background:#202124;color:#f5f5f5;border-radius:12px;padding:14px;font: .9rem/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere;min-height:80px}
 .footer-note{font-size:.78rem;color:var(--muted);text-align:center;margin:18px 6px}.status{font-size:.8rem;color:var(--green);font-weight:700}
 @media(max-width:560px){.grid{grid-template-columns:1fr}.toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:14px}h1{font-size:1.35rem}}
 @media print{
@@ -35,7 +35,7 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 </style>
 </head>
 <body>
-<header><div class="header-inner"><div class="eyebrow">Incident reporting • Offline-ready</div><h1>HOT / What &amp; Incident Aid Memoire</h1><p>METHANE report generator · HOT &amp; WHAT security assessment</p></div></header>
+<header><div class="header-inner"><h1>HOT / What &amp; Incident Aid Memoire</h1></div></header>
 <main>
 <div class="toolbar no-print">
 <button class="primary" id="copyBtn">▣ Copy report</button>
@@ -44,7 +44,7 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 <button class="outline" id="saveBtn">✓ Save report</button>
 </div>
 <div class="card no-print" id="reportOptions"><h2>Select report sections</h2><p class="intro">Tick the sections to include in the compiled report. Empty fields and untouched default answers are omitted.</p><div class="choice-row">
-<label class="choice"><input type="checkbox" class="report-section" value="details" checked> Incident details</label>
+<label class="choice"><input type="checkbox" class="report-section" value="details" checked disabled> Incident details (always included)</label>
 <label class="choice"><input type="checkbox" class="report-section" value="methane" checked> METHANE</label>
 <label class="choice"><input type="checkbox" class="report-section" value="jesip" checked> JESIP principles</label>
 <label class="choice"><input type="checkbox" class="report-section" value="hot" checked> HOT assessment</label>
@@ -108,6 +108,21 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 <p class="footer-note">Use alongside current JESIP doctrine, local security policy and control-room instructions. This tool supports information gathering; it does not replace training, command decisions or emergency procedures.</p>
 </main>
 <script>
+// Make content sections collapsible and collapsed by default.
+document.querySelectorAll('main > .card').forEach(card=>{
+ if(card.id==='reportOptions')return;
+ const heading=card.querySelector(':scope > h2');
+ if(!heading)return;
+ const intro=card.querySelector(':scope > p.intro');
+ const details=document.createElement('details'); details.className='section-collapse';
+ const summary=document.createElement('summary'); summary.textContent=heading.textContent;
+ details.appendChild(summary);
+ if(intro){details.appendChild(intro);}
+ const content=document.createElement('div'); content.className='section-content';
+ [...card.children].forEach(child=>{if(child!==heading && child!==intro)content.appendChild(child)});
+ details.appendChild(content);
+ card.replaceChildren(details);
+});
 const $=id=>document.getElementById(id);
 const ids=['dateTime','incidentStart','incidentEnd','reporter','agency','contact','summary','location','type','hazards','access','casualties','services','updates','colocate','communicate','coordinate','risk','ssa','decisions','hotHidden','hotObvious','hotTypical','hotActions','hotNotified','whatDoing','whatBehaviour','whatAlone','whatThreat','securityRisk','securityActions'];
 const radios=['major','hotH','hotO','hotT','whatW','whatH','whatA','whatT'];
@@ -115,12 +130,12 @@ const storageKey='jesipIncidentAssessment.v3';
 function val(id){return ($(id)?.value||'').trim()}
 function radio(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||'Not recorded'}
 function field(label,id){const v=val(id);return v?`${label}: ${v}`:''}
-function sectionEnabled(name){return document.querySelector(`.report-section[value="${name}"]`)?.checked!==false}
+function sectionEnabled(name){if(name==='details')return true;return document.querySelector(`.report-section[value="${name}"]`)?.checked!==false}
 function compact(lines){return lines.filter(Boolean)}
 function buildReport(){
- const lines=['HOT / WHAT & INCIDENT AID MEMOIRE'];
+ const lines=[];
  if(sectionEnabled('details')){
-  lines.push('','INCIDENT DETAILS',field('Reported', 'dateTime'),field('Incident start time','incidentStart'),field('Incident conclusion / stood down time','incidentEnd'),field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),field('Initial incident summary','summary'));
+  lines.push('','INCIDENT DETAILS',field('Reported', 'dateTime'),field('Incident start time','incidentStart'),(val('incidentEnd')?field('Incident conclusion / stood down time','incidentEnd'):'Incident conclusion / stood down time: ONGOING'),field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),field('Initial incident summary','summary'));
  }
  if(sectionEnabled('methane')){
   const methane=compact([field('E — Exact location','location'),field('T — Type of incident','type'),field('H — Hazards present or suspected','hazards'),field('A — Access and egress','access'),field('N — Number and severity of casualties','casualties'),field('E — Emergency services present / required','services'),field('Further information / updates','updates')]);
