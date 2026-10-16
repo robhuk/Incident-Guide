@@ -43,6 +43,13 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 <button class="outline" id="pdfBtn">▤ Save / print PDF</button>
 <button class="outline" id="saveBtn">✓ Save report</button>
 </div>
+<div class="card no-print" id="reportOptions"><h2>Select report sections</h2><p class="intro">Tick the sections to include in the compiled report. Empty fields and untouched default answers are omitted.</p><div class="choice-row">
+<label class="choice"><input type="checkbox" class="report-section" value="details" checked> Incident details</label>
+<label class="choice"><input type="checkbox" class="report-section" value="methane" checked> METHANE</label>
+<label class="choice"><input type="checkbox" class="report-section" value="jesip" checked> JESIP principles</label>
+<label class="choice"><input type="checkbox" class="report-section" value="hot" checked> HOT assessment</label>
+<label class="choice"><input type="checkbox" class="report-section" value="what" checked> WHAT assessment</label>
+</div></div>
 <p class="status no-print" id="topSaveStatus" aria-live="polite">Auto-save is on — changes are saved on this device as you type.</p>
 <div class="card">
 <h2>1. Incident details</h2><p class="intro">Record what is known. Use plain English and distinguish confirmed facts from reports or assumptions.</p>
@@ -104,36 +111,38 @@ textarea{resize:vertical;min-height:84px}input:focus,select:focus,textarea:focus
 const $=id=>document.getElementById(id);
 const ids=['dateTime','incidentStart','incidentEnd','reporter','agency','contact','summary','location','type','hazards','access','casualties','services','updates','colocate','communicate','coordinate','risk','ssa','decisions','hotHidden','hotObvious','hotTypical','hotActions','hotNotified','whatDoing','whatBehaviour','whatAlone','whatThreat','securityRisk','securityActions'];
 const radios=['major','hotH','hotO','hotT','whatW','whatH','whatA','whatT'];
-const storageKey='jesipIncidentAssessment.v2';
+const storageKey='jesipIncidentAssessment.v3';
 function val(id){return ($(id)?.value||'').trim()}
 function radio(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||'Not recorded'}
-function field(label,id){return `${label}: ${val(id)||'Not recorded'}`}
+function field(label,id){const v=val(id);return v?`${label}: ${v}`:''}
+function sectionEnabled(name){return document.querySelector(`.report-section[value="${name}"]`)?.checked!==false}
+function compact(lines){return lines.filter(Boolean)}
 function buildReport(){
- const lines=[
- 'JESIP INCIDENT ASSESSMENT',
- `Reported: ${val('dateTime')||'Not recorded'}`,
- field('Incident start time','incidentStart'),field('Incident conclusion / stood down time','incidentEnd'),
- field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),
- '', 'INITIAL INCIDENT SUMMARY',val('summary')||'Not recorded',
- '', 'M/ETHANE REPORT',
- `M — Major incident status: ${radio('major')}`,
- field('E — Exact location','location'),field('T — Type of incident','type'),field('H — Hazards present or suspected','hazards'),field('A — Access and egress','access'),field('N — Number and severity of casualties','casualties'),field('E — Emergency services present / required','services'),field('Further information / updates','updates'),
- '', 'JESIP PRINCIPLES / SHARED UNDERSTANDING',
- field('Co-locate','colocate'),field('Communicate','communicate'),field('Co-ordinate','coordinate'),field('Jointly understand risk','risk'),field('Shared situational awareness','ssa'),field('Actions / decisions / owner','decisions'),
- '', 'HOT ASSESSMENT — SUSPICIOUS ITEM',
- `H — Hidden: ${radio('hotH')}`,field('Observations','hotHidden'),
- `O — Obviously suspicious: ${radio('hotO')}`,field('Observations','hotObvious'),
- `T — Typical: ${radio('hotT')}`,field('Context','hotTypical'),field('Actions taken','hotActions'),field('Who was notified / when','hotNotified'),
- '', 'WHAT SECURITY ASSESSMENT',
- field('W — What are they doing?','whatDoing'),
- field('H — How are they behaving?','whatBehaviour'),
- field('A — Are they alone or with others?','whatAlone'),
- field('T — What threat do they pose?','whatThreat'),
- field('Overall security concern / rationale','securityRisk'),field('Immediate actions / escalation','securityActions'),
- '', 'END OF REPORT',
- 'Information should be verified and updated as the incident develops. Follow current local procedures and instructions.'
- ];
- return lines.join('\n');
+ const lines=['HOT / WHAT & INCIDENT AID MEMOIRE'];
+ if(sectionEnabled('details')){
+  lines.push('','INCIDENT DETAILS',field('Reported', 'dateTime'),field('Incident start time','incidentStart'),field('Incident conclusion / stood down time','incidentEnd'),field('Reporter / call sign / headcode','reporter'),field('Organisation / agency / operator','agency'),field('Contact / radio channel / phone number','contact'),field('Initial incident summary','summary'));
+ }
+ if(sectionEnabled('methane')){
+  const methane=compact([field('E — Exact location','location'),field('T — Type of incident','type'),field('H — Hazards present or suspected','hazards'),field('A — Access and egress','access'),field('N — Number and severity of casualties','casualties'),field('E — Emergency services present / required','services'),field('Further information / updates','updates')]);
+  const major=document.querySelector('input[name="major"]:checked')?.value;
+  if(major && major!=='Unknown') methane.unshift(`M — Major incident status: ${major}`);
+  if(methane.length)lines.push('','M/ETHANE REPORT',...methane);
+ }
+ if(sectionEnabled('jesip')){
+  const jesip=compact([field('Co-locate','colocate'),field('Communicate','communicate'),field('Co-ordinate','coordinate'),field('Jointly understand risk','risk'),field('Shared situational awareness','ssa'),field('Actions / decisions / owner','decisions')]);
+  if(jesip.length)lines.push('','JESIP PRINCIPLES / SHARED UNDERSTANDING',...jesip);
+ }
+ if(sectionEnabled('hot')){
+  const hot=[];
+  [['H — Hidden','hotH','hotHidden'],['O — Obviously suspicious','hotO','hotObvious'],['T — Typical','hotT','hotTypical']].forEach(([label,r,id])=>{const answer=radio(r);const observation=field('Observations / context',id);if(observation || (answer && answer!=='Unknown'))hot.push(`${label}${answer&&answer!=='Unknown'?': '+answer:''}`,observation)});
+  hot.push(field('Actions taken','hotActions'),field('Who was notified / when','hotNotified'));
+  const clean=compact(hot);if(clean.length)lines.push('','HOT ASSESSMENT — SUSPICIOUS ITEM',...clean);
+ }
+ if(sectionEnabled('what')){
+  const what=compact([field('W — What are they doing?','whatDoing'),field('H — How are they behaving?','whatBehaviour'),field('A — Are they alone or with others?','whatAlone'),field('T — What threat do they pose?','whatThreat'),field('Overall security concern / rationale','securityRisk'),field('Immediate actions / escalation','securityActions')]);
+  if(what.length)lines.push('','WHAT SECURITY ASSESSMENT',...what);
+ }
+ return lines.length>1?lines.join('\n'):'No completed information in the selected report sections.';
 }
 function state(){const s={};ids.forEach(id=>s[id]=$(id).value);radios.forEach(n=>s['radio:'+n]=radio(n));return s}
 function applyState(s){if(!s)return;ids.forEach(id=>{if(s[id]!==undefined)$(id).value=s[id]});radios.forEach(n=>{const el=[...document.querySelectorAll(`input[name="${n}"]`)].find(x=>x.value===s['radio:'+n]);if(el)el.checked=true});updatePreview()}
@@ -141,6 +150,7 @@ function save(){try{localStorage.setItem(storageKey,JSON.stringify(state()));con
 function updatePreview(){$('preview').textContent=buildReport();save()}
 ids.forEach(id=>$(id).addEventListener('input',updatePreview));
 radios.forEach(n=>document.querySelectorAll(`input[name="${n}"]`).forEach(el=>el.addEventListener('change',updatePreview)));
+document.querySelectorAll('.report-section').forEach(el=>el.addEventListener('change',updatePreview));
 async function copyReport(){const text=buildReport();try{await navigator.clipboard.writeText(text);alert('Report copied to clipboard.')}catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();alert(ok?'Report copied to clipboard.':'Copy was blocked. Use the report preview to select and copy.');}}
 $('copyBtn').addEventListener('click',copyReport);
 $('emailBtn').addEventListener('click',()=>{const subject=encodeURIComponent('JESIP Incident Assessment — '+(val('location')||'Location not recorded'));const body=encodeURIComponent(buildReport());location.href=`mailto:?subject=${subject}&body=${body}`;});
